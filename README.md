@@ -3,14 +3,12 @@
 
 # DataBass: Not Quite a DataBase
 
-This isn't your average database. This will be the base of operations for exanding your data processing knowledge!  The base of your data exploration in this class!  It will cover the bassics of query execution that you will learn in class!
+This is a simple Python-based analytical database for instructional purposes.  See the [system design](./docs/design.md) for details.  It is meant to give students exposure to query processing concepts in a system that goes from SQL strings to query results.
 
-We present to you....  the **DATABASS..Bass...bass**.  
-
+If you had fun doing the assignments for this, the course [W6113](https://w6113.github.io) features assignments based on a more advanced version of DataBass.
 
 ## Getting Started
 
-This is a simple Python-based analytical database for instructional purposes.  See the [system design](./docs/design.md) for details.
 
 Installation
 

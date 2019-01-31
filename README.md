@@ -70,7 +70,7 @@ Or the parsed query plan of a SQL query
 		FROM()
 		  Scan(data AS data)
 
-When the program starts, DataBass automatically crawls all subdirectories and loads any CSV files that it finds into memory.  In our example, [src/engine/data](./src/engine/data) contains two CSV files: [data.csv](../src/engine/data/data.csv) and [iowa-liquor-sample.csv](./src/engine/data/iowa-liquor-sample.csv).
+When the program starts, DataBass automatically crawls all subdirectories and loads any CSV files that it finds into memory.  In our example, [src/engine/data](./src/databass/data) contains two CSV files: [data.csv](../src/databass/data/data.csv) and [iowa-liquor-sample.csv](./src/databass/data/iowa-liquor-sample.csv).
 
 	> show tables
 	data

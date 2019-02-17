@@ -1,6 +1,15 @@
+import zipfile
 import click
 import subprocess
-import shutil
+import os
+import os.path as path
+
+def add_dir_to_zip(dirname, zfile, ext=".py"):
+  for pyfname in os.listdir(dirname):
+    fullname = path.join(dirname, pyfname)
+    if ext is None or pyfname.endswith(ext):
+      zfile.write(fullname)
+
 
 assignments = ['aa%s' % i for i in range(0,4)]
 digits = "1234567890"
@@ -46,8 +55,11 @@ def main(u1, u2, a, q):
       return
 
   # Package and check the code
-  fname = "%s_%s_%s" % (assignment, uni1, uni2)
-  shutil.make_archive(fname, 'zip', "databass", ".")
+  fname = "%s_%s_%s.zip" % (assignment, uni1, uni2)
+  with zipfile.ZipFile(fname, "w") as zfile:
+    add_dir_to_zip("databass", zfile)
+    add_dir_to_zip("compiler", zfile)
+
   print "Created %s.zip  MAKE SURE TO SUBMIT THE ZIP FiLE!" % fname
 
 

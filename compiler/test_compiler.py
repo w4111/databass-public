@@ -137,7 +137,6 @@ class TestUnits(unittest.TestCase):
 
         print list(q.compile()(db))[:3]
         print list(q)[:3]
-        import pdb; pdb.set_trace()
         assert list(q) == list(q.compile()(db))
 
         print "Project test results are:"

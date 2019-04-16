@@ -3,58 +3,54 @@ import unittest
 import random
 import timeit
 
-#These functions test whether your code is computing cardinalities correctly. 
-#We've hardcoded in values from our master databass. 
+#These functions test whether your code is computing cardinalities correctly.
+#We've hardcoded in values from our master databass.
 
-#We're also checking whether your implementation beats the exhaustive_bestplan, 
+#We're also checking whether your implementation beats the exhaustive_bestplan,
 #which if you follow the suggested directions, should automatically happen.
 
 class TestUnits(unittest.TestCase):
 
     def tearDown(x):
-        print """"
+        pass
 
-########################################
-
-PASSING THE TEST CASES DOES NOT MEAN YOUR OPTIMIZER IS WORKING since we are not asserting anything in them.
-
-Make sure your query plan matches the one provided in the comments of each test case.
-
-########################################
-"""
-
-   
-    def test_card_cost(self):
-        
-
+    def test_easyjoin(self):
         f = From([
         Scan("data", "A"),
         Scan("data2", "B"),
         ])
-  
-        preds = cond_to_func("(b = 2) and (b = n)")
+        print "test join"
+        preds = cond_to_func("(a = 2) and (b = m)")
         w = Filter(f, preds)
-
+        print w
         db = Database()
         opt = Optimizer(db)
-
-        print "Test 1 join plan"
+        print "Test selingerOpt join plan"
         print opt(w)
+        sel_opt = SelingerOpt(db)
+        o = opt(w)
+        joins = []
 
-        '''
-        Below is what your code should output:
+        def get_join(op):
+            if isinstance(op, Join):
+                joins.append(op)
+            for c in op.children():
+                get_join(c)
 
-Test 1 join plan
-WHERE((b = n))
-  THETAJOIN(ON True)
-    Scan(data AS A)
-    Scan(data2 AS B)
-        '''
-        
+        get_join(o)
+        answer = []
+        for j in joins:
+            answer.append((sel_opt.card(j), sel_opt.cost(j)))
+        print answer
+       
+        assert answer == [(400.0, 460.0)]
+
+
     def test_selfjoin(self):
-    #test that self joins work better than exhaustive best plan (w.r.t computation time)  
-
-
+    # this part test the cost and cadinality of the each join node
+    # You should observe that self joins with selingerOpt work better than exhaustive best plan (w.r.t computation time)
+        print
+        print "test2: selfjoin"
         f = From([
         Scan("data", "A"),
         Scan("data", "B"),
@@ -64,56 +60,37 @@ WHERE((b = n))
         Scan("data", "F"),
         Scan("data", "G")
         ])
-  
+
         preds = cond_to_func("(a = 2) and (b = f) and (a = b) and (b = c) and (c = d)")
         w = Filter(f, preds)
         print w
         db = Database()
         opt = Optimizer(db)
-        print "Test 2 join plan"
-        print opt(w)
+        print "Test selingerOpt join plan"
+        print(opt(w))
+        sel_opt = SelingerOpt(db)
+        o = opt(w)
+        joins = []
+
+        def get_join(op):
+            if isinstance(op, Join):
+                joins.append(op)
+            for c in op.children():
+                get_join(c)
+
+        get_join(o)
+        answer = []
+        for j in joins:
+            answer.append((sel_opt.card(j), sel_opt.cost(j)))
+
+        assert answer == [(1280000000.0, 1482105260.0), (64000000.0, 74105260.0), (3200000.0, 3705260.0), (160000.0, 185260.0), (8000.0, 9260.0), (400.0, 460.0)]
 
 
-        '''
-        Below is what your code should output:
-(don't have to print the lines beginning 'tested'; those are just for your debugging)
-
-Test 2 join plan
-tested A True 9260.0 1.0
-tested B True 9260.0 1.0
-tested C True 9260.0 1.0
-tested D True 9260.0 1.0
-tested E True 9260.0 1.0
-tested A True 185260.0 1.0
-tested B True 185260.0 1.0
-tested C True 185260.0 1.0
-tested D True 185260.0 1.0
-tested A True 3705260.0 1.0
-tested B True 3705260.0 1.0
-tested C True 3705260.0 1.0
-tested A True 74105260.0 1.0
-tested B True 74105260.0 1.0
-tested A True 1482105260.0 1.0
-WHERE((a = 2.0) and (b = f) and (a = b) and (b = c) and (c = d))
-  THETAJOIN(ON True)
-    Scan(data AS A)
-    THETAJOIN(ON True)
-      Scan(data AS B)
-      THETAJOIN(ON True)
-        Scan(data AS C)
-        THETAJOIN(ON True)
-          Scan(data AS D)
-          THETAJOIN(ON True)
-            Scan(data AS E)
-            THETAJOIN(ON True)
-              Scan(data AS F)
-              Scan(data2 AS G)
- 
-        '''
     def test_multijoin(self):
-    #test that multi joins work better than exhaustive best plan (w.r.t computation time)  
-    
-
+    # this part test the cost and cadinality of the each multi-join node
+    # You should observe that self joins with selingerOpt work better than exhaustive best plan (w.r.t computation time)
+        print
+        print "test3: multijoin"
         f = From([
         Scan("data", "A"),
         Scan("data", "B"),
@@ -121,52 +98,34 @@ WHERE((a = 2.0) and (b = f) and (a = b) and (b = c) and (c = d))
         Scan("data", "D"),
         Scan("data2", "E"),
         Scan("data", "F"),
-        Scan("data2", "G")
+        Scan("data2", "G"),
+        Scan("data3", "H")
         ])
-  
-        preds = cond_to_func("(a = 2) and (b = c) and (a = b) and (b = c) and (c = d)")
+
+
+        preds = cond_to_func("(a = 2) and (b = c) and (a = b) and (b = c) and (c = d) and (s = z)")
         w = Filter(f, preds)
         print w
         db = Database()
         opt = Optimizer(db)
-        print "Test 3 join plan"
+        print "Test selingerOpt join plan"
         print opt(w)
+        sel_opt = SelingerOpt(db)
+        o = opt(w)
+        joins = []
 
-'''
-Below is what your code should print:
-(don't have to print the lines beginning 'tested'; those are just for your debugging)
+        def get_join(op):
+            if isinstance(op, Join):
+                joins.append(op)
+            for c in op.children():
+                get_join(c)
 
-Test 3 join plan
-tested A True 9260.0 1.0
-tested B True 9260.0 1.0
-tested C True 9260.0 1.0
-tested D True 9260.0 1.0
-tested E True 9260.0 1.0
-tested A True 185260.0 1.0
-tested B True 185260.0 1.0
-tested C True 185260.0 1.0
-tested D True 185260.0 1.0
-tested A True 3705260.0 1.0
-tested B True 3705260.0 1.0
-tested C True 3705260.0 1.0
-tested A True 74105260.0 1.0
-tested B True 74105260.0 1.0
-tested A True 1482105260.0 1.0
-WHERE((a = 2.0) and (b = s) and (a = m) and (c = d))
-  THETAJOIN(ON True)
-    Scan(data AS A)
-    THETAJOIN(ON True)
-      Scan(data AS B)
-      THETAJOIN(ON True)
-        Scan(data2 AS C)
-        THETAJOIN(ON True)
-          Scan(data AS D)
-          THETAJOIN(ON True)
-            Scan(data2 AS E)
-            THETAJOIN(ON True)
-              Scan(data AS F)
-              Scan(data2 AS G)
-'''
+        get_join(o)
+        answer = []
+        for j in joins:
+            answer.append((sel_opt.card(j), sel_opt.cost(j)))
+
+        assert answer == [(25600000000.0, 29642105260.0), (1280000000.0, 1482105260.0), (64000000.0, 74105260.0), (3200000.0, 3705260.0), (160000.0, 185260.0), (8000.0, 9260.0), (400.0, 460.0)]
 
 if __name__ == '__main__':
   unittest.main()

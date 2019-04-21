@@ -348,9 +348,18 @@ class SelingerOpt(object):
     # is 1 if True (cross-product), or 0 if False
     if join.cond.is_type(Bool):
       return join.cond() * 1.0
+    
+    
+    if join.l.is_type(Scan):
+      lsel = self.selectivity_attr(join.l, join.cond.l.attr if join.cond.l.tablename == join.l.alias else join.cond.r.attr)
+    else:
+      lsel = 1.0
 
-    lsel = self.selectivity_attr(join.l, join.cond.l.attr)
-    rsel = self.selectivity_attr(join.r, join.cond.r.attr)
+    if join.r.is_type(Scan):
+      rsel = self.selectivity_attr(join.r,join.cond.l.attr if join.cond.l.tablename == join.r.alias else join.cond.r.attr)
+    else:
+      rsel = 1.0
+ 
     return min(lsel, rsel)
 
   def selectivity_attr(self, source, attr):

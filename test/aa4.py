@@ -1,6 +1,5 @@
 from databass import *
 import unittest
-import random
 import timeit
 
 #These functions test whether your code is computing cardinalities correctly.
@@ -20,7 +19,7 @@ class TestUnits(unittest.TestCase):
         Scan("data2", "B"),
         ])
         print "test join"
-        preds = cond_to_func("(a = 2) and (b = m)")
+        preds = cond_to_func("(A.a = 2) and (A.b = B.m)")
         w = Filter(f, preds)
         print w
         db = Database()
@@ -42,8 +41,8 @@ class TestUnits(unittest.TestCase):
         for j in joins:
             answer.append((sel_opt.card(j), sel_opt.cost(j)))
         print answer
-       
-        assert answer == [(400.0, 460.0)]
+
+        assert answer == [(20.0, 422.0)]
 
 
     def test_selfjoin(self):
@@ -61,7 +60,7 @@ class TestUnits(unittest.TestCase):
         Scan("data", "G")
         ])
 
-        preds = cond_to_func("(a = 2) and (b = f) and (a = b) and (b = c) and (c = d)")
+        preds = cond_to_func("(A.a = 2) and (B.b = C.f) and (E.a = F.b) and (E.b = G.c) and (F.c = G.d)")
         w = Filter(f, preds)
         print w
         db = Database()
@@ -83,7 +82,10 @@ class TestUnits(unittest.TestCase):
         for j in joins:
             answer.append((sel_opt.card(j), sel_opt.cost(j)))
 
-        assert answer == [(1280000000.0, 1482105260.0), (64000000.0, 74105260.0), (3200000.0, 3705260.0), (160000.0, 185260.0), (8000.0, 9260.0), (400.0, 460.0)]
+        print answer
+
+        assert answer == [(1312820.5128205128, 1537877.4358974358), (65641.02564102564, 93774.8717948718), (3282.051282051282, 21569.74358974359), (820.5128205128206, 4831.282051282052), (205.1282051282051, 646.6666666666667), (10.256410256410255, 421.02564102564105)]
+
 
 
     def test_multijoin(self):
@@ -103,7 +105,7 @@ class TestUnits(unittest.TestCase):
         ])
 
 
-        preds = cond_to_func("(a = 2) and (b = c) and (a = b) and (b = c) and (c = d) and (s = z)")
+        preds = cond_to_func("(A.a = 2) and (A.b = B.c) and (B.a = C.m) and (D.a = E.o) and (F.c = G.m) and (G.s = H.z)")
         w = Filter(f, preds)
         print w
         db = Database()
@@ -125,7 +127,10 @@ class TestUnits(unittest.TestCase):
         for j in joins:
             answer.append((sel_opt.card(j), sel_opt.cost(j)))
 
-        assert answer == [(25600000000.0, 29642105260.0), (1280000000.0, 1482105260.0), (64000000.0, 74105260.0), (3200000.0, 3705260.0), (160000.0, 185260.0), (8000.0, 9260.0), (400.0, 460.0)]
+        print answer
+
+        assert answer == [(91428.57142857143, 975913.4285714285), (22857.14285714286, 509627.71428571426), (22857.14285714286, 50199.14285714285), (1142.857142857143, 25056.28571428571), (1142.8571428571427, 2084.8571428571427), (57.14285714285714, 827.7142857142857), (20.0, 422.0)]
+
 
 if __name__ == '__main__':
   unittest.main()

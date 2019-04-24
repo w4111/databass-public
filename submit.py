@@ -11,7 +11,7 @@ def add_dir_to_zip(dirname, zfile, ext=".py"):
       zfile.write(fullname)
 
 
-assignments = ['aa%s' % i for i in range(0,4)]
+assignments = ['aa%s' % i for i in range(0,5)]
 digits = "1234567890"
 check_bad_uni = lambda uni: uni is None or any(c not in digits for c in uni[-4:])
 
